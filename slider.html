@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        .slider{
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 100px auto;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .slider:hover{
+            outline: 2px solid rgb(97, 206, 249);
+            box-shadow: 0 0 20px rgba(97, 206, 249, 0.8);
+        }
+
+        .slider .slider_main{
+            position: absolute;
+            width: 400px;
+            height: 400px;
+        }
+
+        .slider .change{
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 100px;
+            background-color: rgba(0, 0, 0, 0.5);
+            font-size: 50px;
+            line-height: 100px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .slider .next{
+            right: 0;
+        }
+
+        .slider .pre{
+            left: 0;
+        }
+
+        .slider_main .item{
+            position: absolute;
+            width: 400px;
+            height: 400px;
+        }
+
+        .slider_main .item img{
+            width: 400px
+        }
+
+        .slider_index{
+            position: absolute;
+            bottom: 0;
+            width: 400px;
+            height: 50px;
+            background-color: rgba(0,0,0,0.3);
+        }
+
+        .pointer_wrapper{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .pointer_wrapper .pointer{
+            margin: 0 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+        }
+        .pointer_wrapper .pointer.active{
+            color: rgb(252, 82, 82);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="slider" id="slider">
+        <div class="slider_main" id="slider_main">
+            <div class="item">
+                <a href="javascript:;">
+                    <img src="./imgs/dahuangmao-01.png" alt="dahuangmao">
+                </a>
+            </div>
+            <div class="item">
+                <a href="javascript:;">
+                    <img src="./imgs/dahuangmao-02.png" alt="dahuangmao">
+                </a>
+            </div>
+            <div class="item">
+                <a href="javascript:;">
+                    <img src="./imgs/dahuangmao-03.png" alt="dahuangmao">
+                </a>
+            </div>
+            <div class="item">
+                <a href="javascript:;">
+                    <img src="./imgs/dahuangmao-04.png" alt="dahuangmao">
+                </a>
+            </div>
+            <div class="item">
+                <a href="javascript:;">
+                    <img src="./imgs/dahuangmao-05.png" alt="dahuangmao">
+                </a>
+            </div>
+        </div>
+        <span class="next change" id="next">》</span>
+        <span class="pre change" id="pre">《</span>
+        <span class="slider_index" id="slider_index">
+            <!-- 内容通过 js 动态生成 -->
+        </span>
+    </div>
+
+    <script src="./js/startAnimation.js"></script>
+    <script src="./js/anime.min.js"></script>
+    <script>
+        // 0 指示图片位置的变量
+        var now = 0
+
+        // 1 获取 dom 节点
+        var main = document.getElementById("slider_main")
+        var items = main.children
+        var pre = document.getElementById("pre")
+        var next = document.getElementById("next")
+        var index = document.getElementById("slider_index")
+        
+        // 2 动态添加索引器
+        var pointer_wrapper = document.createElement("div")
+        pointer_wrapper.className = "pointer_wrapper"
+        for (var i = 0; i < items.length; i++){
+            var pointer = document.createElement("span")
+            if (i === 0){
+                pointer.className = "pointer active"
+            }else{
+                pointer.className = "pointer"
+            }
+            pointer.innerText = i + 1
+            pointer_wrapper.appendChild(pointer)
+        }
+        index.appendChild(pointer_wrapper)
+
+        // 3 图片位置初始化
+        var width = parseInt(getStyle(main, "width"))
+        for (var i = 0; i < items.length; i++){
+            if (i !== 0){
+                items[i].style.left = width + "px"
+            }
+        }
+
+        // 4 下一张的点击事件
+        next.onclick = function (){
+            changeImage()
+        }
+
+        // 5 上一张的点击事件
+        pre.onclick = function () {
+            changeImage(false)
+        }
+
+        // 点击上一张和下一张的逻辑相似，封装一下
+        function changeImage(isNext=true){
+            // 1 把当前图片向左/右移除可视框
+            // startAnimation(items[now], {left: isNext ? -width : width})
+            anime({
+                targets: items[now],
+                left: (isNext ? -width : width) + "px",
+                easing: "linear"
+            })
+
+            // 2 修改当前图片索引 now
+            isNext ? now++ : now--
+            if (now >= items.length){
+                now = 0
+            }else if (now < 0) {
+                now = items.length - 1
+            }
+
+            // 3 把下一张图片移到可视框的右边/左边
+            items[now].style.left = (isNext ? width : -width) + "px" 
+
+            // 4 把下一张图片移到可视框
+            // startAnimation(items[now], {left: 0})
+            anime({
+                targets: items[now],
+                left: 0,
+                easing: "linear"
+            })
+
+            // 5 修改索引器
+            var pointers = pointer_wrapper.children
+            for (var i = 0; i < pointers.length; i++){
+                if (i === now){
+                    pointers[i].className = "pointer active"
+                }else{
+                    pointers[i].className = "pointer"
+                }
+            }   
+        }
+
+        // 6 点击索引器跳转
+        var pointers = pointer_wrapper.children
+        for (var i = 0; i < pointers.length; i++){
+            pointers[i].index = i
+            pointers[i].onclick = function (){
+                if (now === this.index) return
+                if (now > this.index){
+                    startAnimation(items[now], {left: width})
+                    now = this.index
+                    items[now].style.left = -width + "px"
+                    startAnimation(items[now], {left: 0})
+                    for (var j = 0; j < pointers.length; j++){
+                        if (j === now){
+                            pointers[j].className = "pointer active"
+                        }else{
+                            pointers[j].className = "pointer"
+                        }
+                    }
+                }else{
+                    startAnimation(items[now], {left: -width})
+                    now = this.index
+                    items[now].style.left = width + "px"
+                    startAnimation(items[now], {left:0})
+                    for (var j = 0; j < pointers.length; j++){
+                        if (j === now){
+                            pointers[j].className = "pointer active"
+                        }else{
+                            pointers[j].className = "pointer"
+                        }
+                    }
+                }
+            }
+        }
+
+        // // 7 自动播放
+        // setInterval(() => {
+        //     changeImage()
+        // }, 3000)
+
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            padding: 20px;
+        }
+        #root{
+            width: 100px;
+            height: 100px;
+            background-color: aqua;
+            margin-top: 20px;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <button id="btn">点我启动动画</button>
+    <div id="root"></div>
+    <script src="./js/startAnimation.js"></script>
+    <script>
+        // 1.获取节点
+        var btn = document.getElementById("btn")
+        var box = document.getElementById("root")
+
+        // 2.按钮绑定事件
+        btn.onclick = function () {
+            startAnimation(box, {
+                width: 500,
+                height: 600,
+                opacity: 0.3
+            }, () => {
+                startAnimation(box, {
+                    width: 100,
+                    height: 100,
+                    opacity: 1
+                }, () => {
+                    console.log("动画完成")
+                })
+            })
+        }
+
+    </script>
+</body>
+</html>
