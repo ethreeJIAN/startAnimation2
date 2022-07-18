@@ -3,8 +3,10 @@
 ## 用法
 
 ```html
+<!-- 引入 js 文件 -->
 <script src="js/startAnimation.js"></script>
 <script>
+  // 调用函数
   startAnimation(box, {
     left: 200,
     width: 300,
